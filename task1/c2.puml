@@ -1,0 +1,33 @@
+@startuml C2 Container Context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Boundary(identity, "Идентификация"){
+    Container(identity_service, "Сервис идентификации", "ASP.NET.Core + Duende Identity Server", "Аутентификация, авторизация, регистрация, логин и учет пользователей")
+    ContainerDb(identity_db, "БД идентификации", "Postgres")
+}
+
+Boundary(catalog, "Каталог"){
+    Container(catalog_service, "Сервис каталога", "ASP.NET.Core", "Просмотр и поиск товаров, а также добавление, изменение и удаление товаров")
+    ContainerDb(catalog_db, "БД каталога", "Postgres")
+}
+
+Boundary(cart, "Корзина"){
+    Container(cart_service, "Сервис корзины", "ASP.NET.Core", "Управление корзиной пользователя")
+    ContainerDb(cart_db, "БД каталога", "Redis")
+}
+
+Boundary(ordering, "Заказы"){
+    Container(ordering_service, "Сервис оформления заказов", "ASP.NET.Core", "Оформление и обработка заказов")
+    ContainerDb(ordering_db, "БД сервиса заказов", "EventStoreDB")
+}
+
+Container(notifications, "Сервис уведомлений", "ASP.NET.Core", "Отправка уведомлений (в т.ч. email)")
+Container(bff, "BFF", "GraphQL")
+   
+ContainerQueue(messageBus, "Брокер сообщений", "Kafka")
+
+System_Ext(paymentGateway, "Платежный шлюз")
+System_Ext(logistics, "Логистическая система")
+System_Ext(email_server, "Mail сервер")
+LAYOUT_TOP_DOWN()
+@enduml 
