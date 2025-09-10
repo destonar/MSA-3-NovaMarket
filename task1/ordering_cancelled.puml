@@ -1,0 +1,49 @@
+@startuml ordering cancelled
+title "Оформление заказа" — Заказ отменен покупателем
+
+actor "Продавец" as seller
+actor "Покупатель" as customer
+
+participant "Корзина" as cart
+participant "Заказы" as ordering
+participant "Склад" as inventory
+participant "Доставка" as shipping
+participant "Уведомления" as notifications
+
+== Checkout ==
+customer -> cart : оформить заказ
+cart -> ordering : заказ создан
+
+== Reserve ==
+ordering -> inventory : резерв товара
+inventory -> ordering : товар зарезервирован
+
+== Payment ==
+ordering -> customer : передан на оплату
+customer -> ordering : оплата успешна
+
+== Shipping == 
+ordering -> notifications : заказ создан
+notifications -> seller : заказ создан
+
+seller -> shipping : передача в доставку
+shipping -> ordering : передан в доставку
+
+ordering -> notifications : передан в доставку
+notifications -> customer : передан в доставку
+
+== Cancelled ==
+
+customer -> ordering : отмена заказа
+ordering -> shipping : заказ отменен
+shipping -> ordering : доставка отменена
+
+ordering -> inventory : заказ отменен
+inventory -> ordering : резерв снят
+
+ordering -> ordering : платеж возвращен
+
+ordering -> notifications : заказ отменен
+notifications -> seller : заказ отменен
+
+@enduml

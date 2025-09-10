@@ -1,0 +1,19 @@
+@startuml ordering reservation failed
+title "Оформление заказа" — Не удалось зарезервировать
+
+actor "Покупатель" as customer
+
+participant "Корзина" as cart
+participant "Заказы" as ordering
+participant "Склад" as inventory
+
+== Checkout ==
+customer -> cart : оформить заказ
+cart -> ordering : заказ создан
+
+== Reserve ==
+ordering -> inventory : резерв товара
+inventory -> ordering : резерв не был успешен
+ordering -> customer : резерв не был успешен
+
+@enduml

@@ -63,8 +63,10 @@ Rel_U(messageBus, cart, "События изменения каталога то
 Rel_D(ordering, messageBus, "События изменения статуса заказа")
 Rel_U(messageBus, ordering, "События изменения статуса заказа")
 
-Rel_D(inventory, messageBus, "События резерва товаров")
-Rel_U(messageBus, inventory, "События оформления и отмены заказа")
+Rel(cart, ordering, "Оформление заказа")
+Rel(ordering, inventory, "Резервирование товара")
+Rel_D(inventory, messageBus, "События увеличения и уменьшения количества товаров ")
+Rel_U(messageBus, inventory, "События отмены заказов")
 
 Rel_D(shipping, messageBus, "События доставки товаров")
 Rel_U(messageBus, shipping, "События оплаты товара")

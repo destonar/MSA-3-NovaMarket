@@ -1,0 +1,27 @@
+@startuml ordering payment fail
+title "Оформление заказа" — Оплата отклонена
+
+actor "Покупатель" as customer
+
+participant "Корзина" as cart
+participant "Заказы" as ordering
+participant "Склад" as inventory
+
+== Checkout ==
+customer -> cart : оформить заказ
+cart -> ordering : заказ создан
+
+== Reserve ==
+ordering -> inventory : резерв товара
+inventory -> ordering : товар зарезервирован
+
+== Payment ==
+ordering -> customer : передан на оплату
+customer -> ordering : оплата отклонена
+
+== Cancel Reservation ==
+
+ordering -> inventory : заказ отменен
+inventory -> ordering : резерв снят
+
+@enduml
