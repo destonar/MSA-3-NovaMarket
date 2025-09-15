@@ -1,0 +1,20 @@
+@startuml Event Map
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Container(cart, "Корзина")
+Container(catalog, "Каталог")
+Container(ordering, "Заказы")
+Container(shipping, "Доставка")
+Container(inventory, "Склад")
+Container(notifications, "Уведомления")
+
+Rel(inventory, catalog, "Поступление товаров, изменение доступного количества товаров")
+Rel(inventory, cart, "Поступление товаров, изменение доступного количества товаров")
+
+Rel(ordering, shipping, "Событие передачи в доставку")
+Rel(shipping, ordering, "Информация о доставке заказа (сроки, отмена, успех)")
+Rel(ordering, notifications, "События изменения статуса заказа")
+
+Rel(ordering, inventory, "Отмена резерва товара")
+
+@enduml 

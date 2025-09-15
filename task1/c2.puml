@@ -1,0 +1,81 @@
+@startuml C2 Container Context
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Boundary(identity, "Идентификация"){
+    Container(identity_service, "Сервис идентификации", "Keycloack", "Аутентификация, авторизация, регистрация, логин и учет пользователей")
+    ContainerDb(identity_db, "БД идентификации", "PostgreSQL")
+    Rel(identity_service, identity_db, "Read/Write")
+}
+
+Boundary(catalog, "Каталог"){
+    Container(catalog_service, "Сервис каталога", "ASP.NET.Core", "Просмотр и поиск товаров, а также добавление, изменение и удаление товаров")
+    ContainerDb(catalog_db, "БД каталога", "PostgreSQL")
+    Rel(catalog_service, catalog_db, "Read/Write")
+}
+
+Boundary(cart, "Корзина"){
+    Container(cart_service, "Сервис корзины", "ASP.NET.Core", "Управление корзиной пользователя")
+    ContainerDb(cart_db, "БД корзины", "Redis")
+    Rel(cart_service, cart_db, "Read/Write")
+}
+
+Boundary(ordering, "Заказы"){
+    Container(ordering_service, "Сервис оформления заказов", "ASP.NET.Core", "Оформление и обработка заказов")
+    ContainerDb(ordering_db, "БД сервиса заказов", "EventStoreDB")
+    Rel(ordering_service, ordering_db, "Read/Write")
+}
+
+Boundary(shipping, "Доставка"){
+    Container(shipping_service, "Сервис доставки", "ASP.NET.Core", "Управление доставкой товара")
+    ContainerDb(shipping_db, "БД сервиса заказов", "PostgreSQL")
+    Rel(shipping_service, shipping_db, "Read/Write")
+}
+
+Boundary(inventory, "Склад"){
+    Container(inventory_service, "Сервис склада", "ASP.NET.Core", "Управление наличием товара, резервирование и инвентаризация")
+    ContainerDb(inventory_db, "БД сервиса заказов", "PostgreSQL")
+    Rel(inventory_service, inventory_db, "Read/Write")
+}
+
+Boundary(notifications, "Уведомления"){
+    Container(notification_service, "Сервис уведомлений", "ASP.NET.Core", "Отправка уведомлений (Push, email)")
+    ContainerDb(notification_db, "БД сервиса уведомлений", "PostgreSQL")
+    Rel(notification_service, notification_db, "Read/Write")
+}
+
+Container(gateway, "API Gateway")
+   
+ContainerQueue(messageBus, "Брокер сообщений", "Kafka")
+
+System_Ext(paymentGateway, "Платежный шлюз")
+System_Ext(logistics, "Логистическая система")
+System_Ext(email_server, "Mail сервер")
+
+Rel_D(gateway, identity, "Аутентификация, авторизация", "REST")
+Rel_D(gateway, catalog, "Получение информации о продуктах, поиск и фильтрация", "GraphQL")
+Rel_D(gateway, cart, "Добавление покупок в корзину, просмотр корзины", "REST")
+Rel_D(gateway, ordering, "Оформление и отслеживание заказа", "REST")
+Rel_D(gateway, notifications, "Настройка получения уведомлений", "REST")
+
+Rel_D(catalog, messageBus, "События изменения каталога товаров")
+Rel_U(messageBus, cart, "События изменения каталога товаров, события изменения товаров на складе")
+
+Rel_D(ordering, messageBus, "События изменения статуса заказа")
+Rel_U(messageBus, ordering, "События изменения статуса заказа")
+
+Rel(cart, ordering, "Оформление заказа")
+Rel(ordering, inventory, "Резервирование товара")
+Rel_D(inventory, messageBus, "События увеличения и уменьшения количества товаров ")
+Rel_U(messageBus, inventory, "События отмены заказов")
+
+Rel_D(shipping, messageBus, "События доставки товаров")
+Rel_U(messageBus, shipping, "События оплаты товара")
+
+Rel_D(messageBus, notifications, "События изменения статуса заказа")
+
+Rel(ordering, paymentGateway, "Оплата")
+Rel(shipping, logistics, "Обеспечение доставки")
+Rel(notifications, email_server, "Отправка почтовых уведомлений")
+
+LAYOUT_TOP_DOWN()
+@enduml 
